@@ -26,10 +26,10 @@ public class User {
     @Column(unique = true)
     private String username;
     
-    @NotEmpty
+    @NotBlank
     private String password;
 
-    @NotEmpty
+    @NotBlank
     @Email
     @Column(unique = true)
     private String email;

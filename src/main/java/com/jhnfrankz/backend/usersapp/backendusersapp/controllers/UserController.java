@@ -1,11 +1,14 @@
 package com.jhnfrankz.backend.usersapp.backendusersapp.controllers;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.User;
 import com.jhnfrankz.backend.usersapp.backendusersapp.services.UserService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
@@ -51,17 +56,32 @@ public class UserController {
         return ResponseEntity.notFound().build();
     }
 
+    /*
+     * Con @Valid indicamos que se debe validar el objeto user de acuerdo a las
+     * anotaciones que tiene en su clase
+     * El BindingResult es para obtener los errores de validacion, siempre debe ir
+     * despues del objeto a validar
+     */
+
     // cuando se haga post a /users, se ejecuta este metodo
     // Indicamos que el user se recibe en el body de la peticion
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody User user) {
+    public ResponseEntity<?> create(@Valid @RequestBody User user, BindingResult result) {
+        if (result.hasErrors()) {
+            return validation(result);
+        }
+
         // retornamos el usuario en el body y el codigo 201
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(user));
     }
 
     // el user viene en el body de la peticion
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@RequestBody User user, @PathVariable Long id) {
+    public ResponseEntity<?> update(@Valid @RequestBody User user, BindingResult result, @PathVariable Long id) {
+        if (result.hasErrors()) {
+            return validation(result);
+        }
+
         Optional<User> o = service.update(user, id);
         if (o.isPresent()) {
             // retornamos el usuario actualizado y el codigo 201
@@ -80,5 +100,15 @@ public class UserController {
         }
 
         return ResponseEntity.notFound().build(); // 404
+    }
+
+    private ResponseEntity<?> validation(BindingResult result) {
+        Map<String, String> errors = new HashMap<>();
+
+        result.getFieldErrors().forEach(err -> {
+            errors.put(err.getField(), "El campo " + err.getField() + " " + err.getDefaultMessage());
+        });
+        
+        return ResponseEntity.badRequest().body(errors);
     }
 }
