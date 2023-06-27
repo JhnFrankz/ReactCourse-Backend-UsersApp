@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.User;
-import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.UserRequest;
+import com.jhnfrankz.backend.usersapp.backendusersapp.models.request.UserRequest;
 import com.jhnfrankz.backend.usersapp.backendusersapp.services.UserService;
 
 import jakarta.validation.Valid;
@@ -73,6 +73,8 @@ public class UserController {
         }
 
         // retornamos el usuario en el body y el codigo 201
+        // el save puede dar error en caso de que ya exista un usuario
+        // y lanzaria un error 500, que se controla con el try catch
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(user));
     }
 
