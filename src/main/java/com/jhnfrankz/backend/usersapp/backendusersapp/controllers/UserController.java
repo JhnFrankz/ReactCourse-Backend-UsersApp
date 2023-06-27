@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.User;
+import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.UserRequest;
 import com.jhnfrankz.backend.usersapp.backendusersapp.services.UserService;
 
 import jakarta.validation.Valid;
@@ -77,7 +78,7 @@ public class UserController {
 
     // el user viene en el body de la peticion
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@Valid @RequestBody User user, BindingResult result, @PathVariable Long id) {
+    public ResponseEntity<?> update(@Valid @RequestBody UserRequest user, BindingResult result, @PathVariable Long id) {
         if (result.hasErrors()) {
             return validation(result);
         }
@@ -108,7 +109,7 @@ public class UserController {
         result.getFieldErrors().forEach(err -> {
             errors.put(err.getField(), "El campo " + err.getField() + " " + err.getDefaultMessage());
         });
-        
+
         return ResponseEntity.badRequest().body(errors);
     }
 }
