@@ -1,25 +1,23 @@
 package com.jhnfrankz.backend.usersapp.backendusersapp.auth.filters;
 
-import java.io.IOException;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.fasterxml.jackson.core.exc.StreamReadException;
+import com.fasterxml.jackson.databind.DatabindException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.User;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.User;
-
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 // por debajo se maneja una ruta url /login
 // Se ejecuta este filtro cuando se hace un POST a /login
@@ -71,7 +69,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-            Authentication authResult) throws IOException, ServletException {
+                                            Authentication authResult) throws IOException, ServletException {
 
         // Obtenemos el username del usuario autenticado
         String username = ((org.springframework.security.core.userdetails.User) authResult.getPrincipal())
@@ -82,7 +80,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         // agregamos el token al header de la respuesta
         response.addHeader("Authorization", "Bearer " + token);
-        
+
         // creamos un objeto para convertirlo a json
         Map<String, Object> body = new HashMap<>();
         body.put("token", token);
@@ -97,6 +95,16 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-            AuthenticationException failed) throws IOException, ServletException {
+                                              AuthenticationException failed) throws IOException, ServletException {
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "Error en la autenticacion username o password incorrecto");
+        body.put("error", failed.getMessage());
+
+        // convertimos el body a json y lo escribimos en el response
+        response.getWriter().write(new ObjectMapper().writeValueAsString(body));
+        // enviamos el status 401 (Unauthorized)
+        response.setStatus(401);
+        response.setContentType("application/json");
     }
 }

@@ -18,8 +18,8 @@ public class SpringSecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(authRules -> authRules
-                .requestMatchers(HttpMethod.GET, "/users").permitAll() // la ruta /users es publica
-                .anyRequest().authenticated()) // el resto de rutas deben estar autenticadas
+                        .requestMatchers(HttpMethod.GET, "/users").permitAll() // la ruta /users es publica
+                        .anyRequest().authenticated()) // el resto de rutas deben estar autenticadas
                 .csrf(config -> config.disable()) // en api rest no se usa csrf
                 .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // en api rest no se usa, lo ponemos en sin estado
