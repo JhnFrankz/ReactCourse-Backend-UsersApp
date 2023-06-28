@@ -1,6 +1,9 @@
 package com.jhnfrankz.backend.usersapp.backendusersapp.auth.filters;
 
 import java.io.IOException;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,7 +50,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             user = new ObjectMapper().readValue(request.getInputStream(), User.class);
             username = user.getUsername();
             password = user.getPassword();
-            
+
             logger.info("Username desde request InputSream (raw): " + username);
             logger.info("Password desde request InputSream (raw): " + password);
         } catch (StreamReadException e) {
@@ -58,7 +61,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             e.printStackTrace();
         }
 
-        // creamos un UsernamePasswordAuthenticationToken con el username y password para que lo autentique el AuthenticationManager
+        // creamos un UsernamePasswordAuthenticationToken con el username y password
+        // para que lo autentique el AuthenticationManager
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password);
 
         // pasamos el authToken al AuthenticationManager para que lo autentique
@@ -68,6 +72,27 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
             Authentication authResult) throws IOException, ServletException {
+
+        // Obtenemos el username del usuario autenticado
+        String username = ((org.springframework.security.core.userdetails.User) authResult.getPrincipal())
+                .getUsername();
+        // creamos una frase secreta y la codificamos en base64
+        String originalInput = "algun_token_con_alguna_frase_secreta." + username;
+        String token = Base64.getEncoder().encodeToString(originalInput.getBytes());
+
+        // agregamos el token al header de la respuesta
+        response.addHeader("Authorization", "Bearer " + token);
+        
+        // creamos un objeto para convertirlo a json
+        Map<String, Object> body = new HashMap<>();
+        body.put("token", token);
+        body.put("message", String.format("Hola %s, has iniciado sesion con exito", username));
+        body.put("username", username);
+
+        // convertimos el body a json y lo escribimos en el response
+        response.getWriter().write(new ObjectMapper().writeValueAsString(body));
+        response.setStatus(200);
+        response.setContentType("application/json");
     }
 
     @Override
