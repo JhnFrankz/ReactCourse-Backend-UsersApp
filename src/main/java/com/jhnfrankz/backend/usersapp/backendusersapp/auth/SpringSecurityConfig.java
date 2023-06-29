@@ -5,13 +5,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+// esta clase tendrá metodos que crearan instancias de objetos y los guardaran en el contexto
 @Configuration
 public class SpringSecurityConfig {
 
@@ -20,15 +23,18 @@ public class SpringSecurityConfig {
 
     @Bean
     PasswordEncoder passwordEncoder() {
-        // este password encoder no encripta la contraseña, solo es para pruebas
-        return NoOpPasswordEncoder.getInstance();
+        // retornamos el ByCryptPasswordEncoder para que se encripten las contraseñas
+        return new BCryptPasswordEncoder();
     }
 
-    /*
-     * Cuando anotamos un metodo con @Bean y está dentro de una clase anotada
-     * con @Configuration, lo que devuelve ese metodo se guarda en el contexto de
-     * Spring como un bean. parecido a @Component
-     */
+    // con Bean indicamos que este método devuelve una instancia que queremos que se guarde en el contexto de Spring
+    @Bean
+    AuthenticationManager authenticationManager() throws Exception {
+        // a partir de la configuracion de autenticacionConfiguration, devolvemos el AuthenticationManager
+        // y lo guardamos como un bean en el contexto de Spring
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(authRules -> authRules
