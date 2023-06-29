@@ -8,6 +8,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -15,6 +17,12 @@ public class SpringSecurityConfig {
 
     @Autowired
     private AuthenticationConfiguration authenticationConfiguration;
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        // este password encoder no encripta la contraseña, solo es para pruebas
+        return NoOpPasswordEncoder.getInstance();
+    }
 
     /*
      * Cuando anotamos un metodo con @Bean y está dentro de una clase anotada

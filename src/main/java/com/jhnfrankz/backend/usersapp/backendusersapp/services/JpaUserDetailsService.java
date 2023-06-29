@@ -6,10 +6,14 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+// el UserDetailsService se encarga de buscar al usuario en la base de datos por detrás
+// Los @Service son componentes de Spring que se encargan de la logica de negocio
+@Service
 public class JpaUserDetailsService implements UserDetailsService {
 
     // el UserDetailsService se encarga de buscar al usuario en la base de datos por detrás
