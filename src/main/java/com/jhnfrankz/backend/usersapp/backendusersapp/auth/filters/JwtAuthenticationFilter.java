@@ -23,6 +23,9 @@ import java.util.Map;
 // Se ejecuta este filtro cuando se hace un POST a /login
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+    // el AuthenticationManager se encarga de autenticar al usuario
+    // no lo creamos nosotros, lo crea Spring
+    // por debajo se usa el UserDetailsService para buscar al usuario en la base de datos
     private AuthenticationManager authenticationManager;
 
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
@@ -61,10 +64,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         // creamos un UsernamePasswordAuthenticationToken con el username y password
         // para que lo autentique el AuthenticationManager
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password);
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(username, password);
 
         // pasamos el authToken al AuthenticationManager para que lo autentique
         return authenticationManager.authenticate(authToken);
+        // se usa por debajo el UserDetailsService para buscar al usuario en la base de datos
     }
 
     @Override
