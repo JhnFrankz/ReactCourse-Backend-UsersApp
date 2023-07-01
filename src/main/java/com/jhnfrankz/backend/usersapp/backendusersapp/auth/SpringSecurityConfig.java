@@ -1,6 +1,7 @@
 package com.jhnfrankz.backend.usersapp.backendusersapp.auth;
 
 import com.jhnfrankz.backend.usersapp.backendusersapp.auth.filters.JwtAuthenticationFilter;
+import com.jhnfrankz.backend.usersapp.backendusersapp.auth.filters.JwtValidationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,6 +43,7 @@ public class SpringSecurityConfig {
                 // agregamos el filtro que se ejecuta cuando se hace un POST a /login
                 // y que se encarga de autenticar al usuario
                 .addFilter(new JwtAuthenticationFilter(authenticationConfiguration.getAuthenticationManager()))
+                .addFilter(new JwtValidationFilter(authenticationConfiguration.getAuthenticationManager()))
                 .csrf(config -> config.disable()) // en api rest no se usa csrf
                 .sessionManagement(management ->
                         management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

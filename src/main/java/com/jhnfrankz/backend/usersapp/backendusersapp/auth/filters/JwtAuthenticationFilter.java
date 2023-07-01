@@ -19,6 +19,8 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.jhnfrankz.backend.usersapp.backendusersapp.auth.TokenJwtConfig.*;
+
 // por debajo se maneja una ruta url /login
 // Se ejecuta este filtro cuando se hace un POST a /login
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -80,11 +82,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String username = ((org.springframework.security.core.userdetails.User) authResult.getPrincipal())
                 .getUsername();
         // creamos una frase secreta y la codificamos en base64
-        String originalInput = "algun_token_con_alguna_frase_secreta." + username;
+        String originalInput = SECRET_KEY + "." + username;
         String token = Base64.getEncoder().encodeToString(originalInput.getBytes());
 
         // agregamos el token al header de la respuesta
-        response.addHeader("Authorization", "Bearer " + token);
+        response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);
 
         // creamos un objeto para convertirlo a json
         Map<String, Object> body = new HashMap<>();

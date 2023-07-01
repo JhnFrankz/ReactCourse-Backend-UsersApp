@@ -15,6 +15,8 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import java.io.IOException;
 import java.util.*;
 
+import static com.jhnfrankz.backend.usersapp.backendusersapp.auth.TokenJwtConfig.*;
+
 // El BasicAuthenticationFilter se ejecuta despues de que el usuario se autentica
 // se ejecuta siempre en todos los request(POST, GET, PUT, DELETE, etc)
 public class JwtValidationFilter extends BasicAuthenticationFilter {
@@ -26,16 +28,16 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        String header = request.getHeader(("Authorization"));
+        String header = request.getHeader((HEADER_AUTHORIZATION));
 
-        if (header == null || !header.startsWith("Bearer ")) {
+        if (header == null || !header.startsWith(PREFIX_TOKEN)) {
             chain.doFilter(request, response); // si no hay token, continua con la cadena de filtros
             return;
         }
 
         // obtiene el token que está codificado en base64, tendremos que decodificarlo
-        String token = header.replace("Bearer ", "");
-        byte[] tokenDecodeBytes = Base64.getDecoder().decode("algun_token_con_alguna_frase_secreta.");
+        String token = header.replace(PREFIX_TOKEN, "");
+        byte[] tokenDecodeBytes = Base64.getDecoder().decode(token);
         String tokenDecode = new String(tokenDecodeBytes);
 
         String[] tokenArr = tokenDecode.split(".");
@@ -43,13 +45,14 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
         String username = tokenArr[1];
 
         // si el token es valido, se autentica al usuario
-        if ("algun_token_con_alguna_frase_secreta".equals(secret)) {
+        if (SECRET_KEY.equals(secret)) {
             List<GrantedAuthority> authorities = new ArrayList<>();
             // agregamos el rol del usuario que se autentico en el token
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
+            // no se usa el password ya que solo se usa para autenticar al usuario y no para autorizarlo
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(username, authorities);
+                    new UsernamePasswordAuthenticationToken(username, null, authorities);
 
             // se autentica al usuario, dejamos pasar al usuario a este recurso protegido
             SecurityContextHolder.getContext().setAuthentication(authentication);
