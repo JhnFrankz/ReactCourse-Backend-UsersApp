@@ -24,6 +24,7 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
         super(authenticationManager);
     }
 
+    // este metodo se ejecuta siempre en todos los request(POST, GET, PUT, DELETE, etc)
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -40,7 +41,8 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
         byte[] tokenDecodeBytes = Base64.getDecoder().decode(token);
         String tokenDecode = new String(tokenDecodeBytes);
 
-        String[] tokenArr = tokenDecode.split(".");
+        String[] tokenArr = tokenDecode.split("\\.");
+        System.out.println("tokenArr: " + Arrays.toString(tokenArr));
         String secret = tokenArr[0];
         String username = tokenArr[1];
 

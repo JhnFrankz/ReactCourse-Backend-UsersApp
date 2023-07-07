@@ -43,6 +43,7 @@ public class SpringSecurityConfig {
                 // agregamos el filtro que se ejecuta cuando se hace un POST a /login
                 // y que se encarga de autenticar al usuario
                 .addFilter(new JwtAuthenticationFilter(authenticationConfiguration.getAuthenticationManager()))
+                // agregamos el filtro que se ejecuta en todas las peticiones y que se encarga de validar el token
                 .addFilter(new JwtValidationFilter(authenticationConfiguration.getAuthenticationManager()))
                 .csrf(config -> config.disable()) // en api rest no se usa csrf
                 .sessionManagement(management ->

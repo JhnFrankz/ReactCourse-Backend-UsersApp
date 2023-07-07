@@ -25,6 +25,9 @@ import com.jhnfrankz.backend.usersapp.backendusersapp.services.UserService;
 
 import jakarta.validation.Valid;
 
+// las rutas públicas son las que no necesitan autenticación
+// las rutas privadas son las que necesitan autenticación
+
 @RestController
 @RequestMapping("/users")
 @CrossOrigin(originPatterns = "*")
