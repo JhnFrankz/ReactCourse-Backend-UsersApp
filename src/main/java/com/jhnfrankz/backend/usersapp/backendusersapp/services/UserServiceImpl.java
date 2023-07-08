@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository repository;
+
+    // Imyeplementamos la interfaz PasswordEncoder para encriptar la contraseña
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(readOnly = true)
@@ -32,8 +37,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User save(User user) {
+        // encriptamos la contraseña
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return repository.save(user);
-    }
+    } // cada vez que se guarda un usuario, se encripta la contraseña
 
     @Override
     @Transactional
