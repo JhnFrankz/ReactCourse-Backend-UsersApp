@@ -31,7 +31,8 @@ public class JpaUserDetailsService implements UserDetailsService {
         // Porqué se usa el User de Spring Security y no el User de la entidad User?
         // porque el User de Spring Security implementa UserDetails que es una interfaz
         // que se encarga de manejar la seguridad de los usuarios
-        Optional<com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.User> o = repository.findByUsername(username);
+        Optional<com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.User> o
+                = repository.getUserByUsername(username);
         //simulamos que buscamos el usuario en la base de datos
         if (!o.isPresent()) {
             throw new UsernameNotFoundException(String.format("Username %s no existe en el sistema", username));
