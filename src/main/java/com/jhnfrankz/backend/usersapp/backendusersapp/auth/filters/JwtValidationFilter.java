@@ -41,13 +41,6 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
 
         // obtiene el token que está codificado en base64, tendremos que decodificarlo
         String token = header.replace(PREFIX_TOKEN, "");
-        /*byte[] tokenDecodeBytes = Base64.getDecoder().decode(token);
-        String tokenDecode = new String(tokenDecodeBytes);
-
-        String[] tokenArr = tokenDecode.split("\\.");
-        System.out.println("tokenArr: " + Arrays.toString(tokenArr));
-        String secret = tokenArr[0];
-        String username = tokenArr[1];*/
 
         // si el token es valido, se autentica al usuario
         try {
@@ -60,6 +53,7 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
 
             // el getSubject() es el username del usuario que se autentico en el token
             String username = claims.getSubject();
+            Object username2 = claims.get("username");
 
             List<GrantedAuthority> authorities = new ArrayList<>();
             // agregamos el rol del usuario que se autentico en el token
