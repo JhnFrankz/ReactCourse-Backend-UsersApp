@@ -1,6 +1,9 @@
 package com.jhnfrankz.backend.usersapp.backendusersapp.auth.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,16 +41,26 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
 
         // obtiene el token que está codificado en base64, tendremos que decodificarlo
         String token = header.replace(PREFIX_TOKEN, "");
-        byte[] tokenDecodeBytes = Base64.getDecoder().decode(token);
+        /*byte[] tokenDecodeBytes = Base64.getDecoder().decode(token);
         String tokenDecode = new String(tokenDecodeBytes);
 
         String[] tokenArr = tokenDecode.split("\\.");
         System.out.println("tokenArr: " + Arrays.toString(tokenArr));
         String secret = tokenArr[0];
-        String username = tokenArr[1];
+        String username = tokenArr[1];*/
 
         // si el token es valido, se autentica al usuario
-        if (SECRET_KEY.equals(secret)) {
+        try {
+            // claims es la informacion que se envio en el token, en este caso el username
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(SECRET_KEY)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            // el getSubject() es el username del usuario que se autentico en el token
+            String username = claims.getSubject();
+
             List<GrantedAuthority> authorities = new ArrayList<>();
             // agregamos el rol del usuario que se autentico en el token
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
@@ -59,8 +72,9 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
             // se autentica al usuario, dejamos pasar al usuario a este recurso protegido
             SecurityContextHolder.getContext().setAuthentication(authentication);
             chain.doFilter(request, response);
-        } else {
+        } catch (JwtException e) {
             Map<String, String> body = new HashMap<>();
+            body.put("error", e.getMessage());
             body.put("message", "El token JWT no es valido!");
             //
             response.getWriter().write(new ObjectMapper().writeValueAsString(body));

@@ -82,12 +82,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // Obtenemos el username del usuario autenticado
         String username = ((org.springframework.security.core.userdetails.User) authResult.getPrincipal())
                 .getUsername();
-        String token = Jwts.builder()
-                .setSubject(username)
-                .signWith(SECRET_KEY)
-                .setIssuedAt(new Date())
+        String token = Jwts.builder() // creamos el token
+                .setSubject(username) // agregamos el username del usuario al token
+                .signWith(SECRET_KEY) // firmamos el token con la clave secreta
+                .setIssuedAt(new Date()) // agregamos la fecha de creacion del token
                 .setExpiration(new Date(System.currentTimeMillis() + 3600000L)) // 1 hora
-                .compact();
+                .compact(); // compactamos el token para que quede en un formato mas corto
 
         // agregamos el token al header de la respuesta
         response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);
