@@ -21,7 +21,7 @@ public class User {
     @Size(min = 4, max = 8)
     @Column(unique = true)
     private String username;
-    
+
     @NotBlank
     private String password;
 
@@ -31,6 +31,13 @@ public class User {
     private String email;
 
     @ManyToMany
+    @JoinTable(
+            name = "users_roles", // nombre de la tabla intermedia
+            joinColumns = @JoinColumn(name = "user_id"), // la columna que hace referencia a la tabla users
+            inverseJoinColumns = @JoinColumn(name = "role_id"), // la columna que hace referencia a la tabla roles
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "role_id"})})
+    // uniqueConstraints: esta anotacion es para que no se repita la relacion entre user y role, es decir,
+    // no se repita el user_id y el role_id en la tabla users_roles
     private List<Role> roles;
 
     public Long getId() {
