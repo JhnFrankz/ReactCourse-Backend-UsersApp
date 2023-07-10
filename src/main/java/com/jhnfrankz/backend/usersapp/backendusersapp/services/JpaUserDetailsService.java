@@ -11,9 +11,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 // Los @Service son componentes de Spring que se encargan de la logica de negocio
 @Service
@@ -40,9 +40,10 @@ public class JpaUserDetailsService implements UserDetailsService {
 
         com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.User user = o.orElseThrow();
 
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        // siempre los roles deben empezar con ROLE_
-        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        List<GrantedAuthority> authorities = user.getRoles().stream()
+                // por cada rol, se crea un SimpleGrantedAuthority con el nombre del rol
+                .map(r -> new SimpleGrantedAuthority(r.getName()))
+                .collect(Collectors.toList()); // se convierte a una lista de GrantedAuthority
 
         // retornamos un UserDetails que es una clase de Spring Security
         //luego por detras esto pasa al AuthenticationManager y este se encarga de autenticar al usuario
