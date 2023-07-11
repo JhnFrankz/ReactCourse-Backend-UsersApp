@@ -44,20 +44,23 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
 
         // si el token es valido, se autentica al usuario
         try {
-            // claims es la informacion que se envio en el token, en este caso el username
+            // claims es la informacion que se envio en el token luego del filtro de autenticacion
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(SECRET_KEY)
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
 
+            Object authoritiesClaims = claims.get("authorities");
+
             // el getSubject() es el username del usuario que se autentico en el token
             String username = claims.getSubject();
             Object username2 = claims.get("username");
 
-            List<GrantedAuthority> authorities = new ArrayList<>();
-            // agregamos el rol del usuario que se autentico en el token
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+            // convertimos nuestro objeto authoritiesClaims de estructura json a una lista de GrantedAuthority
+            Collection<? extends GrantedAuthority> authorities =
+                    Arrays.asList(new ObjectMapper().readValue(authoritiesClaims.toString().getBytes(),
+                            SimpleGrantedAuthority[].class));
 
             // no se usa el password ya que solo se usa para autenticar al usuario y no para autorizarlo
             UsernamePasswordAuthenticationToken authentication =
