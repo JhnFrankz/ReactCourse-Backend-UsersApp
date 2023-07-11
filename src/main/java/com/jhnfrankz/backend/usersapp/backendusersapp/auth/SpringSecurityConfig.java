@@ -39,6 +39,13 @@ public class SpringSecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(authRules -> authRules
                         .requestMatchers(HttpMethod.GET, "/users").permitAll() // la ruta /users es publica
+                        .requestMatchers(HttpMethod.GET, "/users/{id}").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/users").hasRole("ADMIN")
+                        // las rutas /users/** solo pueden ser accedidas por usuarios con rol ADMIN, exceptuando
+                        // las rutas definidas anteriormente
+                        .requestMatchers("/users/**").hasRole("ADMIN")
+                        /*.requestMatchers(HttpMethod.DELETE, "/users/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/users/{id}").hasRole("ADMIN")*/
                         .anyRequest().authenticated()) // el resto de rutas deben estar autenticadas
                 // agregamos el filtro que se ejecuta cuando se hace un POST a /login
                 // y que se encarga de autenticar al usuario
