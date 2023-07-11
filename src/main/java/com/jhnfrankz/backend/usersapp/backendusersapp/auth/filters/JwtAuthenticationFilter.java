@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,9 +14,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +67,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         // creamos un UsernamePasswordAuthenticationToken con el username y password
         // para que lo autentique el AuthenticationManager
         UsernamePasswordAuthenticationToken authToken =
@@ -72,7 +74,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         // pasamos el authToken al AuthenticationManager para que lo autentique
         return authenticationManager.authenticate(authToken);
-        // se usa por debajo el UserDetailsService para buscar al usuario en la base de datos
+        // se usa por debajo el UserDetailsService para buscar al usuario en la base de datos y hacer login
     }
 
     @Override
@@ -82,7 +84,18 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // Obtenemos el username del usuario autenticado
         String username = ((org.springframework.security.core.userdetails.User) authResult.getPrincipal())
                 .getUsername();
+
+        Collection<? extends GrantedAuthority> roles = authResult.getAuthorities();
+
+        boolean isAdmin = roles.stream().anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"));
+
+        // Los claims son data que enviamos en el token, estos datos no deben ser sensibles ya que se pueden leer
+        Claims claims = Jwts.claims();
+        claims.put("authorities", new ObjectMapper().writeValueAsString(roles));
+        claims.put("isAdmin", isAdmin);
+
         String token = Jwts.builder() // creamos el token
+                .setClaims(claims) // agregamos los claims
                 .setSubject(username) // agregamos el username del usuario al token
                 .signWith(SECRET_KEY) // firmamos el token con la clave secreta
                 .setIssuedAt(new Date()) // agregamos la fecha de creacion del token

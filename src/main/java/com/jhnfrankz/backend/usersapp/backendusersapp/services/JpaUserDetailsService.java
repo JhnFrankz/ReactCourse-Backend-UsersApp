@@ -47,7 +47,6 @@ public class JpaUserDetailsService implements UserDetailsService {
 
         // retornamos un UserDetails que es una clase de Spring Security
         //luego por detras esto pasa al AuthenticationManager y este se encarga de autenticar al usuario
-        // la clave es 12345 encriptada con bcrypt
         return new User(user.getUsername(),
                 user.getPassword(),
                 true,
