@@ -86,13 +86,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .getUsername();
 
         Collection<? extends GrantedAuthority> roles = authResult.getAuthorities();
-
         boolean isAdmin = roles.stream().anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"));
-
         // Los claims son data que enviamos en el token, estos datos no deben ser sensibles ya que se pueden leer
         Claims claims = Jwts.claims();
         claims.put("authorities", new ObjectMapper().writeValueAsString(roles));
         claims.put("isAdmin", isAdmin);
+        claims.put("username", username);
 
         String token = Jwts.builder() // creamos el token
                 .setClaims(claims) // agregamos los claims

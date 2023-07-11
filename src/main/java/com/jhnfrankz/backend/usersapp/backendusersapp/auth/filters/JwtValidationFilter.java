@@ -60,6 +60,8 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
             // el getSubject() es el username del usuario que se autentico en el token
             String username = claims.getSubject();
             Object username2 = claims.get("username");
+            System.out.println("username: " + username);
+            System.out.println("username2: " + username2);
 
             // convertimos nuestro objeto authoritiesClaims de estructura json a una lista de GrantedAuthority
             Collection<? extends GrantedAuthority> authorities =
