@@ -1,19 +1,18 @@
 package com.jhnfrankz.backend.usersapp.backendusersapp.services;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.Role;
+import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.User;
+import com.jhnfrankz.backend.usersapp.backendusersapp.models.request.UserRequest;
 import com.jhnfrankz.backend.usersapp.backendusersapp.repositories.RoleRepository;
+import com.jhnfrankz.backend.usersapp.backendusersapp.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.User;
-import com.jhnfrankz.backend.usersapp.backendusersapp.models.request.UserRequest;
-import com.jhnfrankz.backend.usersapp.backendusersapp.repositories.UserRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {

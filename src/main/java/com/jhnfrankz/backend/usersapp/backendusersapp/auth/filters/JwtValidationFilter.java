@@ -1,6 +1,7 @@
 package com.jhnfrankz.backend.usersapp.backendusersapp.auth.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jhnfrankz.backend.usersapp.backendusersapp.auth.SimpleGrantedAuthorityJsonCreator;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -16,7 +17,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.jhnfrankz.backend.usersapp.backendusersapp.auth.TokenJwtConfig.*;
 
@@ -59,8 +63,13 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
 
             // convertimos nuestro objeto authoritiesClaims de estructura json a una lista de GrantedAuthority
             Collection<? extends GrantedAuthority> authorities =
-                    Arrays.asList(new ObjectMapper().readValue(authoritiesClaims.toString().getBytes(),
-                            SimpleGrantedAuthority[].class));
+                    Arrays.asList(new ObjectMapper()
+                            // con el addMixIn mezclamos la clase SimpleGrantedAuthority con la clase
+                            // SimpleGrantedAuthorityJsonCreator, le modificamos el constructor para que pase el
+                            // nombre del rol de la propiedad "authority" del json
+                            .addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityJsonCreator.class)
+                            .readValue(authoritiesClaims.toString().getBytes(),
+                                    SimpleGrantedAuthority[].class));
 
             // no se usa el password ya que solo se usa para autenticar al usuario y no para autorizarlo
             UsernamePasswordAuthenticationToken authentication =
