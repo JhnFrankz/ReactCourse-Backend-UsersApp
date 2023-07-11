@@ -1,29 +1,20 @@
 package com.jhnfrankz.backend.usersapp.backendusersapp.controllers;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
+import com.jhnfrankz.backend.usersapp.backendusersapp.models.dto.UserDto;
+import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.User;
+import com.jhnfrankz.backend.usersapp.backendusersapp.models.request.UserRequest;
+import com.jhnfrankz.backend.usersapp.backendusersapp.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.User;
-import com.jhnfrankz.backend.usersapp.backendusersapp.models.request.UserRequest;
-import com.jhnfrankz.backend.usersapp.backendusersapp.services.UserService;
-
-import jakarta.validation.Valid;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 // las rutas públicas son las que no necesitan autenticación
 // las rutas privadas son las que necesitan autenticación
@@ -38,7 +29,7 @@ public class UserController {
 
     // cuando se hace una peticion get a la ruta /users, se ejecuta este metodo
     @GetMapping
-    public List<User> list() {
+    public List<UserDto> list() {
         return service.findAll();
     }
 
@@ -48,7 +39,7 @@ public class UserController {
     // variable deben ser iguales
     @GetMapping("/{id}")
     public ResponseEntity<?> show(@PathVariable Long id) {
-        Optional<User> userOptional = service.findById(id);
+        Optional<UserDto> userOptional = service.findById(id);
 
         if (userOptional.isPresent()) {
             // si el usuario existe, se retorna un response entity con el usuario y el
@@ -88,7 +79,7 @@ public class UserController {
             return validation(result);
         }
 
-        Optional<User> o = service.update(user, id);
+        Optional<UserDto> o = service.update(user, id);
         if (o.isPresent()) {
             // retornamos el usuario actualizado y el codigo 201
             return ResponseEntity.status(HttpStatus.CREATED).body(o.orElseThrow());
@@ -98,7 +89,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> remove(@PathVariable Long id) {
-        Optional<User> o = service.findById(id);
+        Optional<UserDto> o = service.findById(id);
 
         if (o.isPresent()) {
             service.remove(id);

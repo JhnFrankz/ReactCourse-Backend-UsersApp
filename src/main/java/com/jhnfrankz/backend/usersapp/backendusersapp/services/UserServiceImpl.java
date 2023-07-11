@@ -1,5 +1,7 @@
 package com.jhnfrankz.backend.usersapp.backendusersapp.services;
 
+import com.jhnfrankz.backend.usersapp.backendusersapp.models.dto.UserDto;
+import com.jhnfrankz.backend.usersapp.backendusersapp.models.dto.mapper.DtoMapperUser;
 import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.Role;
 import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.User;
 import com.jhnfrankz.backend.usersapp.backendusersapp.models.request.UserRequest;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -29,19 +32,33 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<User> findAll() {
-        return (List<User>) repository.findAll();
+    public List<UserDto> findAll() {
+
+        List<User> users = (List<User>) repository.findAll();
+
+        return users
+                .stream()
+                .map(u -> DtoMapperUser.builder().setUser(u).build())
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> findById(Long id) {
-        return repository.findById(id);
+    public Optional<UserDto> findById(Long id) {
+
+        Optional<User> o = repository.findById(id);
+        if (o.isPresent()) {
+            return Optional.of(
+                    DtoMapperUser.builder().setUser(o.orElseThrow()).build()
+            );
+        }
+
+        return Optional.empty();
     }
 
     @Override
     @Transactional
-    public User save(User user) {
+    public UserDto save(User user) {
         // encriptamos la contraseña
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
@@ -55,13 +72,14 @@ public class UserServiceImpl implements UserService {
         // cada vez que se guarda un usuario, se le asigna el rol de usuario
         user.setRoles(roles);
 
-        return repository.save(user);
+        return DtoMapperUser.builder().setUser(repository.save(user)).build();
     } // cada vez que se guarda un usuario, se encripta la contraseña
 
     @Override
     @Transactional
-    public Optional<User> update(UserRequest user, Long id) {
-        Optional<User> o = this.findById(id);
+    public Optional<UserDto> update(UserRequest user, Long id) {
+
+        Optional<User> o = repository.findById(id);
         User userOptional = null;
 
         if (o.isPresent()) {
@@ -69,15 +87,16 @@ public class UserServiceImpl implements UserService {
             userDb.setUsername(user.getUsername());
             userDb.setEmail(user.getEmail());
             // guardamos en la bd el usuario actualizado y en userOptional
-            userOptional = this.save(userDb);
+            userOptional = repository.save(userDb);
         }
 
-        return Optional.ofNullable(userOptional);
+        return Optional.ofNullable(DtoMapperUser.builder().setUser(userOptional).build());
     }
 
     @Override
     @Transactional
     public void remove(Long id) {
+
         repository.deleteById(id);
     }
 
