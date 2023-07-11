@@ -6,21 +6,19 @@ import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.User;
 public class DtoMapperUser {
     // Patrón de diseño builder
 
-    private static DtoMapperUser mapper;
-
     private User user;
 
     private DtoMapperUser() {
     }
 
     public static DtoMapperUser builder() {
-        mapper = new DtoMapperUser();
-        return mapper;
+        // devolvemos una instancia única cada vez que se llame a este método y no es compartida
+        return new DtoMapperUser();
     }
 
     public DtoMapperUser setUser(User user) {
         this.user = user;
-        return mapper;
+        return this; // devolvemos la instancia de la clase para volver a llamar otros métodos
     }
 
     public UserDto build() {
