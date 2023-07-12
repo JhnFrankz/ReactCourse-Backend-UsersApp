@@ -40,6 +40,9 @@ public class User {
     // no se repita el user_id y el role_id en la tabla users_roles
     private List<Role> roles;
 
+    @Transient // esta anotacion es para que no se cree la columna admin en la tabla users
+    private boolean admin;
+
     public Long getId() {
         return id;
     }
@@ -78,5 +81,13 @@ public class User {
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 }
