@@ -1,5 +1,6 @@
 package com.jhnfrankz.backend.usersapp.backendusersapp.services;
 
+import com.jhnfrankz.backend.usersapp.backendusersapp.models.IUser;
 import com.jhnfrankz.backend.usersapp.backendusersapp.models.dto.UserDto;
 import com.jhnfrankz.backend.usersapp.backendusersapp.models.dto.mapper.DtoMapperUser;
 import com.jhnfrankz.backend.usersapp.backendusersapp.models.entities.Role;
@@ -55,16 +56,7 @@ public class UserServiceImpl implements UserService {
     public UserDto save(User user) {
         // encriptamos la contraseña
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        // buscamos el rol por nombre
-        Optional<Role> o = roleRepository.findByName("ROLE_USER");
-        List<Role> roles = new ArrayList<>();
-        // si existe el rol, lo agregamos a la lista de roles
-        if (o.isPresent()) {
-            roles.add(o.orElseThrow());
-        }
-        // cada vez que se guarda un usuario, se le asigna el rol de usuario
-        user.setRoles(roles);
+        user.setRoles(getRoles(user));
 
         return DtoMapperUser.builder().setUser(repository.save(user)).build();
     } // cada vez que se guarda un usuario, se encripta la contraseña
@@ -77,7 +69,9 @@ public class UserServiceImpl implements UserService {
         User userOptional = null;
 
         if (o.isPresent()) {
+
             User userDb = o.orElseThrow();
+            userDb.setRoles(getRoles(user));
             userDb.setUsername(user.getUsername());
             userDb.setEmail(user.getEmail());
             // guardamos en la bd el usuario actualizado y en userOptional
@@ -90,8 +84,26 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void remove(Long id) {
-
         repository.deleteById(id);
     }
 
+    private List<Role> getRoles(IUser user) {
+
+        Optional<Role> ou = roleRepository.findByName("ROLE_USER");
+        List<Role> roles = new ArrayList<>();
+        // si existe el rol, lo agregamos a la lista de roles
+        if (ou.isPresent()) {
+            roles.add(ou.orElseThrow());
+        }
+
+        // si está marcado el checkbox de administrador, se le asigna el rol de administrador
+        if (user.isAdmin()) {
+            Optional<Role> oa = roleRepository.findByName("ROLE_ADMIN");
+            if (oa.isPresent()) {
+                roles.add(oa.orElseThrow());
+            }
+        }
+
+        return roles;
+    }
 }

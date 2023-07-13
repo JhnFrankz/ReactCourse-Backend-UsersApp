@@ -1,6 +1,5 @@
 package com.jhnfrankz.backend.usersapp.backendusersapp.models.dto;
 
-
 // el dto es el objeto (JSON) que se envia en la respuesta al cliente
 // el request es el objeto que envia el cliente en la peticion al servidor
 // el entity es la persistencia(los datos) en la base de datos

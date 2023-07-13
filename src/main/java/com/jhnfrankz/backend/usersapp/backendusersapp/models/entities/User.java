@@ -1,5 +1,6 @@
 package com.jhnfrankz.backend.usersapp.backendusersapp.models.entities;
 
+import com.jhnfrankz.backend.usersapp.backendusersapp.models.IUser;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -7,9 +8,10 @@ import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
+// la clase User es la persistencia(los datos) en la base de datos y es la clase que se mapea a la tabla users
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements IUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -83,6 +85,7 @@ public class User {
         this.roles = roles;
     }
 
+    @Override
     public boolean isAdmin() {
         return admin;
     }

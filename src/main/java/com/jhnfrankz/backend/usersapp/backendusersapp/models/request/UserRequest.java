@@ -1,10 +1,12 @@
 package com.jhnfrankz.backend.usersapp.backendusersapp.models.request;
 
+import com.jhnfrankz.backend.usersapp.backendusersapp.models.IUser;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public class UserRequest {
+// la clase UserRequest es el objeto que envia el cliente en la peticion al servidor,
+public class UserRequest implements IUser {
 
     @NotBlank
     @Size(min = 4, max = 8)
@@ -32,6 +34,7 @@ public class UserRequest {
         this.email = email;
     }
 
+    @Override
     public boolean isAdmin() {
         return admin;
     }
