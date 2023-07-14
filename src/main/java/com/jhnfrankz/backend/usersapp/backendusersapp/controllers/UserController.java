@@ -21,7 +21,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin(originPatterns = "*")
+@CrossOrigin(originPatterns = "*") // acepta peticiones de cualquier origen, en este caso amazon
 public class UserController {
 
     @Autowired
