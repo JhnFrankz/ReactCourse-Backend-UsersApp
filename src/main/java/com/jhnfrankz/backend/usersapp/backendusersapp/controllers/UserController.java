@@ -6,6 +6,9 @@ import com.jhnfrankz.backend.usersapp.backendusersapp.models.request.UserRequest
 import com.jhnfrankz.backend.usersapp.backendusersapp.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -31,6 +34,14 @@ public class UserController {
     @GetMapping
     public List<UserDto> list() {
         return service.findAll();
+    }
+
+    // el page parte en 0
+    @GetMapping("/page/{page}")
+    public Page<UserDto> list(@PathVariable Integer page) {
+        // PageRequest.of recibe el numero de pagina y el numero de elementos por pagina
+        Pageable pageable = PageRequest.of(page, 8);
+        return service.findAll(pageable);
     }
 
     // ya que el id puede cambiar, se debe usar el path variable

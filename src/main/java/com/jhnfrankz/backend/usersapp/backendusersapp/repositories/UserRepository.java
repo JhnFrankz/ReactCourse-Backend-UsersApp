@@ -1,5 +1,7 @@
 package com.jhnfrankz.backend.usersapp.backendusersapp.repositories;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -18,4 +20,8 @@ public interface UserRepository extends CrudRepository<User, Long> {
     // el ?1 es el primer parametro que se le pasa al metodo
     @Query("select u from User u where u.username=?1")
     Optional<User> getUserByUsername(String username);
+
+    Page<User> findAll(Pageable pageable);
+    //Aqui es User ya que interactuamos y se comunica con la base de datos
+    // y UserDto es solo para la comunicacion con el cliente
 }
