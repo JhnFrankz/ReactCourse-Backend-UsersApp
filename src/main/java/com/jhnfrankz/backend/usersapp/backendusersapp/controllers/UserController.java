@@ -40,7 +40,7 @@ public class UserController {
     @GetMapping("/page/{page}")
     public Page<UserDto> list(@PathVariable Integer page) {
         // PageRequest.of recibe el numero de pagina y el numero de elementos por pagina
-        Pageable pageable = PageRequest.of(page, 8);
+        Pageable pageable = PageRequest.of(page, 4);
         return service.findAll(pageable);
     }
 
